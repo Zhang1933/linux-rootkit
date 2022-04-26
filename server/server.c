@@ -186,7 +186,6 @@ int main(int argc,char *argv[]){
     }
 
     int seq=1;
-    char *QUIT="quit";
     int cmdlen;
     // 持续发送sh 指令
     while(ServerOpen){
