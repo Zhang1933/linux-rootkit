@@ -9,7 +9,7 @@ client: $(objs)
 
 .PHONY: clean
 clean:
-	-rm *.o *.d server
+	-rm *.o *.d client
 
 
 -include $(deps)
