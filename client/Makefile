@@ -1,5 +1,15 @@
-obj-m = client.o
-all:
-	make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) modules
+objs := client.o
+deps := $(objs:.o=.d)
+
+# auto generate dependency  https://stackoverflow.com/questions/39002087/about-the-gnu-make-dependency-files-d
+CPPFLAGS += -MMD -MP 
+
+client: $(objs)
+
+
+.PHONY: clean
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	-rm *.o *.d server
+
+
+-include $(deps)

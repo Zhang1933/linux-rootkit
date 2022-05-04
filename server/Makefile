@@ -1,17 +1,7 @@
-objs := server.o
-deps := $(objs:.o=.d)
+obj-m += server.o
+server-objs := server_main.o
 
-# 自动生成依赖：https://stackoverflow.com/questions/39002087/about-the-gnu-make-dependency-files-d
-CPPFLAGS += -MMD -MP 
-
-#LDLIBS += -lncurses
-
-server: $(objs)
-
-
-.PHONY: clean
+all:
+	make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) modules
 clean:
-	-rm *.o *.d server
-
-
--include $(deps)
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
