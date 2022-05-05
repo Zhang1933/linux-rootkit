@@ -1,9 +1,20 @@
-magic ping - shell execution
+Magic ping - shell execution
+
+
+<center>
+<img src="https://img.shields.io/badge/License-MIT-informational" alt="License - MIT">
+<a href="https://github.com/Zhang1933/linux-rootkit"><img src="https://img.shields.io/static/v1?label=Security&message=Post+penetration+tool&color=informational" alt="Security - Post penetration tool"></a>
+<a href="https://github.com/Zhang1933/linux-rootkit"><img src="https://img.shields.io/static/v1?label=Tested+on&message=5.4.0-109-generic+%23123-Ubuntu+x86_64+GNU%2FLinux&color=yellowgreen" alt="Tested on - 5.4.0-109-generic #123-Ubuntu x86_64 GNU/Linux"></a>
+</center>
+
+
+
 
 ## Features:
 
 * Romete shell command execution by ping.
 * Hiding (Showing) Kernel Module from Userspace. 
+
 
 ## Compile 
 
@@ -12,13 +23,13 @@ magic ping - shell execution
 cd server && make
 ```
 
-### compile client(attacker):
+**Client(attacker):**
 
 ```bash
 cd client && make
 ```
 
-## Romete victim:
+**Romete server (victim):**
 
 ```
 sudo insmod server.mod
@@ -39,6 +50,7 @@ Send signal 64 to show or hide:
 ```
 kill -64 1
 ```
+Use `lsmod` to check.
 
 ## TODO:
 
