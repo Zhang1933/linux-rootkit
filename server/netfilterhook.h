@@ -34,7 +34,6 @@ unsigned int watch_in(void *priv,
 
 
 // packet debug
-static  void pkt_hex_dump(struct sk_buff *skb);
 
 #endif
 

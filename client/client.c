@@ -181,7 +181,7 @@ int main(int argc,char *argv[]){
     tv.tv_usec = RECV_TIMEOUT_USEC;
     int ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     if (ret == -1) {
-        perror("first setsockopt()");
+        perror("setsockopt()");
         return 0;
     }
 
