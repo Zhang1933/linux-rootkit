@@ -1,12 +1,11 @@
 Magic ping - shell execution
 
-
-<center>
+<div align="center">
 <img src="https://img.shields.io/badge/License-MIT-informational" alt="License - MIT">
 <a href="https://github.com/Zhang1933/linux-rootkit"><img src="https://img.shields.io/static/v1?label=Security&message=Post+penetration+tool&color=informational" alt="Security - Post penetration tool"></a>
-<a href="https://github.com/Zhang1933/linux-rootkit"><img src="https://img.shields.io/static/v1?label=Tested+on&message=5.4.0-109-generic+%23123-Ubuntu+x86_64+GNU%2FLinux&color=yellowgreen" alt="Tested on - 5.4.0-109-generic #123-Ubuntu x86_64 GNU/Linux"></a>
-</center>
 
+<a href="https://github.com/Zhang1933/linux-rootkit"><img src="https://img.shields.io/static/v1?label=Tested+on&message=5.4.0-109-generic+%23123-Ubuntu+x86_64+GNU%2FLinux&color=yellowgreen" alt="Tested on - 5.4.0-109-generic #123-Ubuntu x86_64 GNU/Linux"></a>
+</div>
 
 
 
