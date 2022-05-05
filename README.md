@@ -1,10 +1,9 @@
 Magic ping - shell execution
 
 <div align="center">
-<img src="https://img.shields.io/badge/License-MIT-informational" alt="License - MIT">
-<a href="https://github.com/Zhang1933/linux-rootkit"><img src="https://img.shields.io/static/v1?label=Security&message=Post+penetration+tool&color=informational" alt="Security - Post penetration tool"></a>
 
-<a href="https://github.com/Zhang1933/linux-rootkit"><img src="https://img.shields.io/static/v1?label=Tested+on&message=5.4.0-109-generic+%23123-Ubuntu+x86_64+GNU%2FLinux&color=yellowgreen" alt="Tested on - 5.4.0-109-generic #123-Ubuntu x86_64 GNU/Linux"></a>
+![Ping - ICMPv4](https://img.shields.io/badge/Ping-ICMPv4-2ea44f) ![License - MIT](https://img.shields.io/badge/License-MIT-blue) 
+![Security - Post penetration](https://img.shields.io/badge/Security-Post_penetration-yellow) ![Tested on - 5.4.0-109-generic #123-Ubuntu x86_64 GNU/Linux](https://img.shields.io/badge/Tested_on-5.4.0--109--generic_%23123--Ubuntu_x86__64_GNU%2FLinux-orange)
 </div>
 
 
