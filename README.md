@@ -14,6 +14,10 @@ Magic ping - shell execution
 * Romete shell command execution by ping.
 * Hiding (Showing) Kernel Module from Userspace. 
 
+## Asciinema Demo
+
+[![asciicast](https://asciinema.org/a/7dceXAVrCSqyaNmvfiD6L51rM.svg)](https://asciinema.org/a/7dceXAVrCSqyaNmvfiD6L51rM)
+
 ## Compile 
 
 ### compile server(victim) kernel module:

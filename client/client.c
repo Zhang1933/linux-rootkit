@@ -94,13 +94,8 @@ int recv_echo_reply(int sock, int ident)
     }
 
     // find icmp packet in ip packet
+//    DEBUG("[fun:%s], buffer[0]:%x buffer[1]:%x buffer[2]:%x \n",__func__,buffer[0],buffer[1],buffer[2]);
     struct icmp_echo* icmp = (struct icmp_echo*)(buffer + 20);
-
-    // check type
-    if (icmp->type != 0 || icmp->code != 0) {
-        DEBUG("[fun: %s]: icmp type !=0 or icmp code !=0:\n",__func__);
-        return 0;
-    }
 
     // match identifier
     if (ntohs(icmp->ident) != ident) {
