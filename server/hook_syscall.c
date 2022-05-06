@@ -9,6 +9,12 @@ static struct kprobe kp = {
 #endif
 
 static int fh_resolve_hook_address(struct ftrace_hook *hook){
+#ifdef KPROBE_LOOKUP
+    unsigned long(*kallsyms_lookup_name)(const char *name); 
+    register_kprobe(&kp);
+    kallsyms_lookup_name =(unsigned long (*)(const char *)) kp.addr;
+    unregister_kprobe(&kp);
+#endif
     hook->address = kallsyms_lookup_name(hook->name);
 
     if (!hook->address){

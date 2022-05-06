@@ -3,16 +3,16 @@ Magic ping - shell execution
 <div align="center">
 
 ![Ping - ICMPv4](https://img.shields.io/badge/Ping-ICMPv4-2ea44f) ![License - MIT](https://img.shields.io/badge/License-MIT-blue) 
-![Security - Post penetration](https://img.shields.io/badge/Security-Post_penetration-yellow) ![Tested on - 5.4.0-109-generic #123-Ubuntu x86_64 GNU/Linux](https://img.shields.io/badge/Tested_on-5.4.0--109--generic_%23123--Ubuntu_x86__64_GNU%2FLinux-orange)
+![Security - Post penetration](https://img.shields.io/badge/Security-Post_penetration-yellow) 
+
+![Tested on - 5.4.0-109-generic #123-Ubuntu x86_64 GNU/Linux](https://img.shields.io/badge/Tested_on-5.4.0--109--generic_%23123--Ubuntu_x86__64_GNU%2FLinux-orange)
+![Tested on - 5.13.0-40-generic #45~20.04.1-Ubuntu x86_64 GNU/Linux](https://img.shields.io/badge/Tested_on-5.13.0--40--generic_%2345~20.04.1--Ubuntu_x86__64_GNU%2FLinux-orange)
 </div>
-
-
 
 ## Features:
 
 * Romete shell command execution by ping.
 * Hiding (Showing) Kernel Module from Userspace. 
-
 
 ## Compile 
 
@@ -50,9 +50,6 @@ kill -64 1
 ```
 Use `lsmod` to check.
 
-## TODO:
-
-* Kernel version > 5.7 supporting.
 
 ## Thanks && Reference：
 
