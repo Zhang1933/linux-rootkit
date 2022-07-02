@@ -74,7 +74,7 @@ int send_echo_request(int sock, struct sockaddr_in* addr, int ident, int seq,cha
     return 0;
 }
 
-int recv_echo_reply(int sock, int ident)
+int recv_echo_reply(int sock, unsigned short ident)
 {
     // allocate buffer
     char buffer[MTU];
@@ -130,7 +130,7 @@ unsigned char Ping(char *cmd,char *ip,int sock,int seq){
         return -1;
     };
     
-    int ident = getpid();
+    unsigned short ident = getpid();
     
     int ret = send_echo_request(sock, &addr, ident, seq,cmd);
     if (ret == -1) {
