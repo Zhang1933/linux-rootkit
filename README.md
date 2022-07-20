@@ -12,7 +12,7 @@ Magic ping - shell execution
 ## Features:
 
 * Romete shell command execution by ping.
-* Hiding (Showing) Kernel Module from Userspace. 
+* Hiding (or Showing) Kernel Module from Userspace. 
 
 ## Asciinema Demo
 
@@ -20,7 +20,8 @@ Magic ping - shell execution
 
 ## Compile 
 
-### compile server(victim) kernel module:
+**compile server(victim) kernel module:**
+
 ```bash
 cd server && make
 ```
@@ -52,6 +53,7 @@ Send signal 64 to show or hide:
 ```
 kill -64 1
 ```
+
 Use `lsmod` to check.
 
 
