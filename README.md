@@ -1,6 +1,6 @@
 Magic ping - shell execution
 
-![Action Check compiling](https://github.com/Zhang1933/linux_rootkit/actions/workflows/ci.yml/badge.svg)
+![Action Check Compiling](https://github.com/Zhang1933/linux-rootkit/actions/workflows/ci.yml/badge.svg)
 
 
 <div align="center">

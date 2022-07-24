@@ -1,4 +1,4 @@
-name: check compiling and rootkit installing
+name: check client and server compiling
 on:
   workflow_dispatch:
   pull_request:
