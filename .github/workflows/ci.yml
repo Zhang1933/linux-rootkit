@@ -22,7 +22,4 @@ jobs:
       run: |
         cd server && make 
         ls -la
-    - name: checking rootkit installing
-      run: | 
-        sudo insmod server.ko
-        sudo dmesg | grep "Loading module..."
+        find -maxdepth 1  -name $rootkit  | grep .
