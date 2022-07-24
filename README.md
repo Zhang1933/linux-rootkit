@@ -35,7 +35,7 @@ cd client && make
 **Romete server (victim):**
 
 ```
-sudo insmod server.mod
+sudo insmod server.ko
 ```
 
 ## Local attacker:

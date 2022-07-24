@@ -22,7 +22,7 @@ jobs:
       run: |
         cd server && make 
         ls -la
-    - name: checking module installing
+    - name: checking rootkit installing
       run: | 
-        sudo insmod $rootkit
+        sudo insmod server.ko
         sudo dmesg | grep "Loading module..."
