@@ -1,5 +1,8 @@
 Magic ping - shell execution
 
+![Action Check compiling](https://github.com/Zhang1933/linux_rootkit/actions/workflows/ci.yml/badge.svg)
+
+
 <div align="center">
 
 ![Ping - ICMPv4](https://img.shields.io/badge/Ping-ICMPv4-2ea44f) ![License - MIT](https://img.shields.io/badge/License-MIT-blue) 
@@ -35,7 +38,7 @@ cd client && make
 **Romete server (victim):**
 
 ```
-sudo insmod server.mod
+sudo insmod server.ko
 ```
 
 ## Local attacker:
