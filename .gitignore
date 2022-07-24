@@ -1,6 +1,5 @@
 # Normal rules
 #
-.*
 !.gitignore
 *.o
 *.o.*
@@ -29,3 +28,8 @@ Module.symvers
 modules.order
 *.d
 client/client
+.Module.symvers.cmd
+server/.cache/
+server/.modules.order.cmd
+server/.server.ko.cmd
+server/.server.mod.cmd
